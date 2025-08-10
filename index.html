@@ -1,61 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Courses</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LearnStack — Courses</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">Online Courses</div>
-            <ul>
-                <li><a href="#" id="home-link">Home</a></li>
-                <li><a href="#" id="all-courses-link">All Courses</a></li>
-                <li><a href="#" id="my-progress-link">My Progress</a></li>
-            </ul>
-        </nav>
-    </header>
+  <header class="topnav" role="banner">
+    <div class="container nav-inner">
+      <div class="brand" id="site-title">
+        <a href="#" data-route="home" class="logo-link">LearnStack</a>
+      </div>
 
-    <main>
-        <section id="courses-section">
-            <div class="courses-header">
-                <h1>Our Courses</h1>
-                <div class="filter-search-container">
-                    <input type="text" id="search-bar" placeholder="Search for courses...">
-                    <div class="filter-options">
-                        <select id="category-filter">
-                            <option value="all">All Categories</option>
-                        </select>
-                        <select id="level-filter">
-                            <option value="all">All Levels</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div id="courses-grid" class="courses-grid">
-                <!-- Course cards will be injected here by JavaScript -->
-            </div>
-        </section>
+      <button id="hamburger" class="hamburger" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="hamburger-bar" aria-hidden="true"></span>
+        <span class="hamburger-bar" aria-hidden="true"></span>
+        <span class="hamburger-bar" aria-hidden="true"></span>
+      </button>
 
-        <section id="progress-section" class="hidden">
-            <h1>My Progress</h1>
-            <div id="progress-grid" class="courses-grid">
-                <!-- Completed courses will be injected here by JavaScript -->
-            </div>
-        </section>
-    </main>
-
-    <div id="course-details-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div id="modal-body">
-                <!-- Course details will be injected here by JavaScript -->
-            </div>
-        </div>
+      <nav id="main-nav" class="main-nav" role="navigation" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#" data-route="home">Home</a></li>
+          <li><a href="#" data-route="categories">Categories</a></li>
+          <li><a href="#" data-route="progress">My Progress <span id="progress-pill" class="progress-pill" aria-hidden="true"></span></a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
 
-    <script src="script.js"></script>
+  <main id="app" role="main" class="container" data-sheet-url="">
+    <section id="home-page" class="page" aria-labelledby="home-title">
+      <h1 id="home-title" class="sr-only">Courses Home</h1>
+      <div class="controls" role="search" aria-label="Course search and filter">
+        <div class="search-wrap">
+          <label for="search" class="visually-hidden">Search courses</label>
+          <input id="search" type="search" placeholder="Search courses, e.g. 'biology'" autocomplete="off" />
+        </div>
+        <div class="filter-wrap">
+          <label for="category-filter" class="visually-hidden">Filter by category</label>
+          <select id="category-filter" aria-label="Filter by category"></select>
+        </div>
+      </div>
+      <section id="courses-grid" aria-labelledby="courses-heading">
+        <h2 id="courses-heading" class="sr-only">Available Courses</h2>
+        <div id="grid" class="grid" role="list"></div>
+      </section>
+    </section>
+
+    <section id="course-page" class="page" hidden aria-labelledby="course-title">
+      <button id="back-to-home" class="link-back" aria-label="Back to courses">← Back to courses</button>
+      <header class="course-header">
+        <h2 id="course-title"></h2>
+        <div class="meta-row" id="course-meta"></div>
+      </header>
+      <div class="video-wrapper" id="video-wrapper"></div>
+      <article id="course-desc" class="course-desc" aria-labelledby="desc-heading">
+        <h3 id="desc-heading">Course Description</h3>
+        <p id="course-full-desc"></p>
+        <section id="resources" aria-labelledby="resources-heading">
+          <h4 id="resources-heading">Resources</h4>
+          <ul id="resources-list" class="resources-list"></ul>
+        </section>
+        <div class="cta-row">
+          <button id="mark-complete" class="btn primary" aria-pressed="false">Mark as Completed</button>
+          <span id="complete-badge" class="badge hidden" aria-live="polite">Completed ✓</span>
+        </div>
+      </article>
+    </section>
+
+    <section id="progress-page" class="page" hidden aria-labelledby="progress-title">
+      <h2 id="progress-title">My Progress</h2>
+      <div class="progress-summary">
+        <div class="progress-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+        <p id="progress-text">0% complete</p>
+      </div>
+      <section id="completed-list" aria-labelledby="completed-heading">
+        <h3 id="completed-heading">Completed Courses</h3>
+        <ul id="completed-courses" class="completed-courses"></ul>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+      <small>© <span id="year"></span> LearnStack. All rights reserved.</small>
+      <div class="social">
+        <a href="#" aria-label="Twitter (placeholder)" class="social-link">🐦</a>
+        <a href="#" aria-label="LinkedIn (placeholder)" class="social-link">🔗</a>
+        <a href="#" aria-label="GitHub (placeholder)" class="social-link">🐱</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
