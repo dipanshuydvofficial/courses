@@ -1,233 +1,306 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const coursesGrid = document.getElementById('courses-grid');
-    const searchBar = document.getElementById('search-bar');
-    const categoryFilter = document.getElementById('category-filter');
-    const levelFilter = document.getElementById('level-filter');
-    const modal = document.getElementById('course-details-modal');
-    const modalBody = document.getElementById('modal-body');
-    const closeModal = document.querySelector('.close-button');
-    const homeLink = document.getElementById('home-link');
-    const allCoursesLink = document.getElementById('all-courses-link');
-    const myProgressLink = document.getElementById('my-progress-link');
-    const coursesSection = document.getElementById('courses-section');
-    const progressSection = document.getElementById('progress-section');
-    const progressGrid = document.getElementById('progress-grid');
+/* script.js
+   LearnStack full app with live Google Sheets CSV integration for courses.
+*/
 
-    let courses = [];
-    let completedCourses = JSON.parse(localStorage.getItem('completedCourses')) || [];
+/* ======= CONFIG ======= */
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOYa1xUpJrVcd2cvyxlvcu4J3vsK3puGn0opnhnTB1qbRL-_ul6wsFJRDtkpkxytPVhgLslDmy8t3w/pub?output=csv&gid=0";
 
-    // This function now fetches and parses data from the specified Google Sheet.
-    async function fetchCourses() {
-        // This URL points to your Google Sheet and uses the gviz API to get data as JSON.
-        const googleSheetsUrl = 'https://docs.google.com/spreadsheets/d/1dPa3q0OBdXbO22wqWciCO_PZsffhAP_4bg0xb8GGBWo/gviz/tq?gid=0';
+/* ======= FALLBACK DATA ======= */
+const FALLBACK_COURSES = [
+  {
+    id: "c01",
+    title: "Foundations of Biology",
+    short: "Introductory course covering cell structure, taxonomy, and basics.",
+    fulldesc: "Deep dive into the cell, tissues, and plant anatomy with hands-on examples and quizzes.",
+    category: "Biology",
+    level: "Beginner",
+    duration: "4h 20m",
+    price: "Free",
+    video_url: "",
+    resources: "Syllabus (PDF)|#;Images (ZIP)|#"
+  },
+  {
+    id: "c02",
+    title: "Frontend Web Development",
+    short: "HTML, CSS, JavaScript fundamentals and accessible UI patterns.",
+    fulldesc: "Hands-on projects building responsive websites and modern front-ends.",
+    category: "Computer Science",
+    level: "Intermediate",
+    duration: "8h",
+    price: "$25",
+    video_url: "",
+    resources: "Starter kit (ZIP)|#"
+  }
+];
 
-        try {
-            const response = await fetch(googleSheetsUrl);
-            const text = await response.text();
-            
-            // The response is JSONP, we need to extract the JSON part from the wrapper.
-            const jsonString = text.substring(47, text.length - 2);
-            const data = JSON.parse(jsonString);
+/* ======= LOCAL STORAGE ======= */
+const STORAGE_KEY = "learnstack_completed";
+const getCompleted = () => {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  try { return raw ? JSON.parse(raw) : []; } catch { return []; }
+};
+const saveCompleted = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+let completed = new Set(getCompleted());
 
-            // The data is in a 'table' object with 'cols' and 'rows'. We need to format it.
-            const headers = data.table.cols.map(col => col.label);
-            courses = data.table.rows.map(row => {
-                const course = {};
-                // The 'c' property of a row is an array of cells.
-                row.c.forEach((cell, index) => {
-                    const header = headers[index];
-                    // The 'v' property of a cell contains its value. It can be null for empty cells.
-                    const value = cell ? cell.v : ''; 
-                    course[header] = value;
-                });
-                return course;
-            });
-            
-            populateFilters();
-            renderCourses();
-        } catch (error) {
-            console.error('Error fetching or parsing course data:', error);
-            coursesGrid.innerHTML = '<p>Failed to load courses. Please ensure your Google Sheet is publicly accessible ("Anyone with the link can view").</p>';
-        }
+/* ======= DOM ======= */
+const appEl = document.getElementById("app");
+const gridEl = document.getElementById("grid");
+const searchEl = document.getElementById("search");
+const categoryFilter = document.getElementById("category-filter");
+const progressPill = document.getElementById("progress-pill");
+const yearEl = document.getElementById("year");
+const pages = { home: document.getElementById("home-page"), course: document.getElementById("course-page"), progress: document.getElementById("progress-page") };
+const navLinks = document.querySelectorAll('[data-route]');
+const hamburger = document.getElementById("hamburger");
+const mainNav = document.getElementById("main-nav");
+const progressFill = document.getElementById("progress-fill");
+const progressText = document.getElementById("progress-text");
+const completedListEl = document.getElementById("completed-courses");
+const backBtn = document.getElementById("back-to-home");
+const markBtn = document.getElementById("mark-complete");
+const completeBadge = document.getElementById("complete-badge");
+
+const courseTitle = document.getElementById("course-title");
+const courseMeta = document.getElementById("course-meta");
+const videoWrapper = document.getElementById("video-wrapper");
+const courseFullDesc = document.getElementById("course-full-desc");
+const resourcesList = document.getElementById("resources-list");
+
+/* ======= DATA ======= */
+let COURSES = [];
+
+/* ======= INITIALIZATION ======= */
+document.addEventListener("DOMContentLoaded", async () => {
+  yearEl.textContent = new Date().getFullYear();
+
+  // Use data-sheet-url attribute if set, else config constant
+  const attrUrl = appEl.getAttribute("data-sheet-url");
+  const sheetUrl = attrUrl && attrUrl.trim() ? attrUrl.trim() : SHEET_CSV_URL;
+  
+  if(sheetUrl){
+    try {
+      COURSES = await fetchCsvCourses(sheetUrl);
+      console.info("Loaded courses from Google Sheets CSV:", COURSES.length);
+    } catch(e){
+      console.warn("Failed to fetch courses, using fallback data.", e);
+      COURSES = FALLBACK_COURSES;
     }
+  } else {
+    COURSES = FALLBACK_COURSES;
+  }
 
-    function populateFilters() {
-        const categories = [...new Set(courses.map(course => course.Category))];
-        const levels = [...new Set(courses.map(course => course.Level))];
-
-        categories.forEach(category => {
-            if (!category) return; // Skip empty categories
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category;
-            categoryFilter.appendChild(option);
-        });
-
-        levels.forEach(level => {
-            if (!level) return; // Skip empty levels
-            const option = document.createElement('option');
-            option.value = level;
-            option.textContent = level;
-            levelFilter.appendChild(option);
-        });
-    }
-
-    function renderCourses() {
-        const searchTerm = searchBar.value.toLowerCase();
-        const selectedCategory = categoryFilter.value;
-        const selectedLevel = levelFilter.value;
-
-        const filteredCourses = courses.filter(course => {
-            const title = course.Title || '';
-            const description = course.Description || '';
-            const category = course.Category || '';
-            const level = course.Level || '';
-
-            const matchesSearch = title.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm);
-            const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
-            const matchesLevel = selectedLevel === 'all' || level === selectedLevel;
-            return matchesSearch && matchesCategory && matchesLevel;
-        });
-
-        coursesGrid.innerHTML = '';
-        if (filteredCourses.length === 0) {
-            coursesGrid.innerHTML = '<p>No courses match your criteria.</p>';
-        }
-        
-        filteredCourses.forEach(course => {
-            const isCompleted = completedCourses.includes(course.CourseID);
-            const courseCard = document.createElement('div');
-            courseCard.className = 'course-card';
-            courseCard.innerHTML = `
-                ${isCompleted ? '<div class="completed-indicator">✔</div>' : ''}
-                <div class="course-card-content">
-                    <p class="category">${course.Category}</p>
-                    <h3>${course.Title}</h3>
-                    <p>${(course.Description || '').substring(0, 100)}...</p>
-                    <button class="view-course-btn" data-course-id="${course.CourseID}">View Course</button>
-                </div>
-            `;
-            coursesGrid.appendChild(courseCard);
-        });
-    }
-
-    function displayCourseDetails(courseId) {
-        const course = courses.find(c => c.CourseID == courseId);
-        if (course) {
-            modalBody.innerHTML = `
-                <h2>${course.Title}</h2>
-                <p><strong>Category:</strong> ${course.Category} | <strong>Level:</strong> ${course.Level} | <strong>Duration:</strong> ${course.Duration}</p>
-                <div class="course-details-video">
-                    <iframe src="${course.VideoURL.replace("watch?v=", "embed/")}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-                <p>${course.Description}</p>
-                <div class="course-details-resources">
-                    <a href="${course.Resources}" target="_blank" download>Download Resources</a>
-                </div>
-                <button id="mark-completed-btn" data-course-id="${course.CourseID}">Mark as Completed</button>
-            `;
-            modal.style.display = 'block';
-
-            const markCompletedBtn = document.getElementById('mark-completed-btn');
-            markCompletedBtn.addEventListener('click', () => markCourseAsCompleted(course.CourseID));
-        }
-    }
-
-    function markCourseAsCompleted(courseId) {
-        if (!completedCourses.includes(courseId)) {
-            completedCourses.push(courseId);
-            localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
-            renderCourses();
-            if (progressSection.offsetParent !== null) { // Check if progress section is visible
-                renderProgress();
-            }
-            alert('Course marked as completed!');
-            modal.style.display = 'none';
-        } else {
-            alert('You have already completed this course.');
-        }
-    }
-    
-    function renderProgress() {
-        progressGrid.innerHTML = '';
-        const completed = courses.filter(course => completedCourses.includes(course.CourseID));
-
-        if (completed.length === 0) {
-            progressGrid.innerHTML = '<p>You have not completed any courses yet.</p>';
-            return;
-        }
-
-        completed.forEach(course => {
-            const courseCard = document.createElement('div');
-            courseCard.className = 'course-card';
-            courseCard.innerHTML = `
-                <div class="course-card-content">
-                    <p class="category">${course.Category}</p>
-                    <h3>${course.Title}</h3>
-                    <p>${(course.Description || '').substring(0, 100)}...</p>
-                    <button class="view-course-btn" data-course-id="${course.CourseID}">View Course</button>
-                </div>
-            `;
-            progressGrid.appendChild(courseCard);
-        });
-    }
-
-    function showCoursesSection() {
-        coursesSection.classList.remove('hidden');
-        progressSection.classList.add('hidden');
-    }
-
-    function showProgressSection() {
-        coursesSection.classList.add('hidden');
-        progressSection.classList.remove('hidden');
-        renderProgress();
-    }
-
-    searchBar.addEventListener('input', renderCourses);
-    categoryFilter.addEventListener('change', renderCourses);
-    levelFilter.addEventListener('change', renderCourses);
-
-    coursesGrid.addEventListener('click', (e) => {
-        if (e.target.classList.contains('view-course-btn')) {
-            const courseId = e.target.getAttribute('data-course-id');
-            displayCourseDetails(courseId);
-        }
-    });
-    
-    progressGrid.addEventListener('click', (e) => {
-        if (e.target.classList.contains('view-course-btn')) {
-            showCoursesSection();
-            const courseId = e.target.getAttribute('data-course-id');
-            displayCourseDetails(courseId);
-        }
-    });
-
-    closeModal.addEventListener('click', () => {
-        modal.style.display = 'none';
-        modalBody.innerHTML = ''; // Clear modal content
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target == modal) {
-            modal.style.display = 'none';
-            modalBody.innerHTML = ''; // Clear modal content
-        }
-    });
-
-    homeLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showCoursesSection();
-    });
-
-    allCoursesLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showCoursesSection();
-    });
-
-    myProgressLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showProgressSection();
-    });
-
-    fetchCourses();
+  COURSES = COURSES.map(normalizeCourse);
+  renderCategories();
+  renderGrid(COURSES);
+  updateProgressUI();
+  attachHandlers();
+  routeTo("home");
 });
+
+/* ======= CSV fetch & parse ======= */
+async function fetchCsvCourses(csvUrl){
+  const res = await fetch(csvUrl, {cache:"no-store"});
+  if(!res.ok) throw new Error(`Failed to fetch CSV: ${res.status}`);
+  const text = await res.text();
+  return parseCsv(text);
+}
+
+// Simple CSV parser, handles commas and quotes (basic)
+function parseCsv(text){
+  const lines = text.trim().split('\n');
+  const headers = lines.shift().split(',').map(h => h.trim().toLowerCase());
+  const data = [];
+  lines.forEach(line => {
+    // Basic CSV split, won't handle commas inside quotes but should be OK if your CSV is clean
+    const values = line.split(',');
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = values[i] ? values[i].trim() : "");
+    data.push(obj);
+  });
+  return data;
+}
+
+/* ======= Normalize course object ======= */
+function normalizeCourse(raw){
+  const course = {
+    id: raw.id || Math.random().toString(36).slice(2,9),
+    title: raw.title || "Untitled",
+    short: raw.short || raw.summary || "",
+    fulldesc: raw.fulldesc || raw.full_desc || raw.description || raw.short || "",
+    category: raw.category || "General",
+    level: raw.level || "Beginner",
+    duration: raw.duration || "",
+    price: raw.price || "Free",
+    video_url: raw.video_url || "",
+    resources: []
+  };
+  // Parse resources string
+  if(raw.resources){
+    raw.resources.split(";").forEach(r => {
+      const [label, url] = r.split("|").map(x => x.trim());
+      if(url) course.resources.push({name: label || url, href: url});
+    });
+  }
+  // Convert Drive links to embed URL
+  course.embed_url = driveToPreview(course.video_url);
+  return course;
+}
+
+/* ======= Drive video embed converter ======= */
+function driveToPreview(url){
+  if(!url) return "";
+  try {
+    if(url.includes("/preview")) return url;
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+    if(match && match[1]) return `https://drive.google.com/file/d/${match[1]}/preview`;
+    const idParam = (new URL(url)).searchParams.get("id");
+    if(idParam) return `https://drive.google.com/file/d/${idParam}/preview`;
+    return url;
+  } catch {
+    return url;
+  }
+}
+
+/* ======= Render categories dropdown ======= */
+function renderCategories(){
+  const cats = Array.from(new Set(COURSES.map(c => c.category))).sort();
+  categoryFilter.innerHTML = "";
+  const allOpt = document.createElement("option");
+  allOpt.value = "";
+  allOpt.textContent = "All categories";
+  categoryFilter.appendChild(allOpt);
+  cats.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryFilter.appendChild(opt);
+  });
+}
+
+/* ======= Create course card ======= */
+function createCard(course){
+  const el = document.createElement("article");
+  el.className = "card";
+  el.setAttribute("role","listitem");
+  el.innerHTML = `
+    <div class="card-top">
+      <div>
+        <h3>${escapeHtml(course.title)}</h3>
+        <p>${escapeHtml(course.short)}</p>
+        <div class="meta">
+          <span class="kv">${escapeHtml(course.category)}</span>
+          <span class="kv">${escapeHtml(course.level)}</span>
+          <span class="kv">${escapeHtml(course.duration)}</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="meta" style="justify-content:flex-end">
+          <span class="kv">${escapeHtml(course.price)}</span>
+        </div>
+        <div style="margin-top:.6rem">
+          <button class="btn view-btn" data-id="${course.id}">View Course</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div>
+        <small style="color:var(--muted)">${escapeHtml(course.level)} • ${escapeHtml(course.duration)}</small>
+      </div>
+      <div>
+        <span class="badge ${completed.has(course.id) ? '' : 'hidden'}" data-completed="${course.id}">Completed ✓</span>
+      </div>
+    </div>
+  `;
+  return el;
+}
+
+/* ======= Render course grid ======= */
+function renderGrid(list){
+  gridEl.innerHTML = "";
+  if(!list.length){
+    gridEl.innerHTML = `<p style="padding:1rem;color:var(--muted)">No courses match your search or filter.</p>`;
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  list.forEach(c => frag.appendChild(createCard(c)));
+  gridEl.appendChild(frag);
+}
+
+/* ======= Search & filter ======= */
+function filterCourses(){
+  const q = searchEl.value.trim().toLowerCase();
+  const cat = categoryFilter.value;
+  const filtered = COURSES.filter(c => {
+    const haystack = [c.title, c.short, c.category, c.fulldesc].join(" ").toLowerCase();
+    return (!q || haystack.includes(q)) && (!cat || c.category === cat);
+  });
+  renderGrid(filtered);
+}
+
+/* ======= Routing and detail ======= */
+let currentCourse = null;
+function routeTo(page, courseId){
+  Object.values(pages).forEach(p => p.hidden = true);
+  if(page === "home") pages.home.hidden = false;
+  else if(page === "course" && courseId) {
+    pages.course.hidden = false;
+    showCourseDetail(courseId);
+  }
+  else if(page === "progress"){
+    pages.progress.hidden = false;
+    renderCompletedList();
+  } else {
+    pages.home.hidden = false;
+  }
+  navLinks.forEach(a => a.classList.toggle("active", a.dataset.route === page));
+}
+
+function showCourseDetail(id){
+  currentCourse = COURSES.find(c => c.id === id);
+  if(!currentCourse) return;
+  courseTitle.textContent = currentCourse.title;
+  courseMeta.innerHTML = `
+    <span class="kv">${escapeHtml(currentCourse.category)}</span>
+    <span class="kv">${escapeHtml(currentCourse.level)}</span>
+    <span class="kv">${escapeHtml(currentCourse.duration)}</span>
+  `;
+  videoWrapper.innerHTML = "";
+  if(currentCourse.embed_url){
+    const iframe = document.createElement("iframe");
+    iframe.src = currentCourse.embed_url;
+    iframe.width = "100%";
+    iframe.height = "480";
+    iframe.setAttribute("allow","autoplay; encrypted-media");
+    iframe.setAttribute("title", `${currentCourse.title} video`);
+    iframe.style.border = "0";
+    videoWrapper.appendChild(iframe);
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.style.padding = "2rem";
+    placeholder.style.background = "#fff";
+    placeholder.style.borderRadius = "8px";
+    placeholder.style.boxShadow = "var(--small-shadow)";
+    placeholder.textContent = "No video available for this course.";
+    videoWrapper.appendChild(placeholder);
+  }
+  courseFullDesc.textContent = currentCourse.fulldesc || currentCourse.short || "";
+  resourcesList.innerHTML = "";
+  currentCourse.resources.forEach(r => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${escapeHtml(r.name)}</span><a href="${r.href}" target="_blank" rel="noopener noreferrer">Download</a>`;
+    resourcesList.appendChild(li);
+  });
+  const done = completed.has(currentCourse.id);
+  markBtn.textContent = done ? "Completed" : "Mark as Completed";
+  markBtn.disabled = done;
+  markBtn.setAttribute("aria-pressed", done ? "true" : "false");
+  completeBadge.classList.toggle("hidden", !done);
+}
+
+/* ======= Progress UI ======= */
+function updateProgressUI(){
+  const total = COURSES.length;
+  const done = completed.size;
+  const percent = total ? Math.round((done/total)*100) : 0;
+  progressFill.style.width = `${percent}%`;
+  progressFill.setAttribute("aria-valuenow", percent);
