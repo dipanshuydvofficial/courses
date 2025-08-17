@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zoology Course Content | WebMastery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    #mobileMenu { display: none; }
+    /* Use fuchsia for active lecture and hovers */
+    .active-lecture { background: linear-gradient(to right, #fae8ff 60%, #fff 100%); font-weight: bold; }
+    .lecture-tab { cursor: pointer; transition: background 0.2s; }
+    .lecture-tab:hover { background: #fdf4ff; }
+    .lectures-scroll::-webkit-scrollbar { display: none; }
+    .lectures-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-fuchsia-50 font-inter min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white fixed w-full top-0 z-40 shadow-sm">
+    <nav class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+      <a class="text-2xl font-black tracking-tight text-fuchsia-600" href="/">WebMastery</a>
+      <ul id="desktopMenu" class="hidden md:flex items-center space-x-7 text-gray-700 font-semibold">
+        <li><a href="/" class="hover:text-fuchsia-600">Home</a></li>
+        <li><a href="/zoology.html" class="hover:text-fuchsia-600">Course Details</a></li>
+        <li><a href="/zoology-content.html" class="hover:text-fuchsia-600 font-extrabold text-fuchsia-600">Course Content</a></li>
+        <li><a href="#profile" class="hover:text-fuchsia-600"><i class="ph ph-user-circle"></i></a></li>
+      </ul>
+      <div id="menuBtn" class="md:hidden text-3xl text-fuchsia-600 cursor-pointer">&#9776;</div>
+    </nav>
+    <ul id="mobileMenu" class="md:hidden bg-white text-gray-700 flex flex-col space-y-5 p-8 text-lg shadow">
+      <li><a href="/" class="hover:text-fuchsia-600">Home</a></li>
+      <li><a href="/zoology.html" class="hover:text-fuchsia-600">Course Details</a></li>
+      <li><a href="/zoology-content.html" class="hover:text-fuchsia-600 font-extrabold text-fuchsia-600">Course Content</a></li>
+      <li><a href="#profile" class="hover:text-fuchsia-600"><i class="ph ph-user-circle"></i> Profile</a></li>
+    </ul>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-full mx-auto px-2 md:px-4 flex flex-col lg:flex-row gap-6 pt-28 pb-12">
+
+    <!-- Lecture Player Section -->
+    <section class="flex-1 bg-white rounded-xl shadow-lg fade-in order-1 lg:order-1 p-4 md:p-6">
+      <!-- Responsive container with Gumlet embed -->
+      <div style="position:relative; aspect-ratio:427/240;" class="rounded-xl overflow-hidden shadow-2xl mb-6">
+        <iframe
+          loading="lazy" 
+          title="Gumlet video player"
+          src="https://play.gumlet.io/embed/68a1e82d2517393e58840766?background=false&autoplay=false&loop=false&disableControls=false"
+          style="border:none; position: absolute; top: 0; left: 0; height: 100%; width: 100%;"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen;">
+        </iframe>
+      </div>
+
+      <!-- Lecture Info -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <div class="flex-1">
+          <h1 id="lectureTitle" class="text-2xl md:text-3xl font-bold text-fuchsia-700 mb-2">Animal Kingdom Introduction</h1>
+          <div id="lectureDesc" class="text-gray-600 text-lg">An overview of animal classification and characteristics.</div>
+        </div>
+        <!-- Controls: Previous/Next -->
+        <div class="flex gap-2 mt-3 md:mt-0">
+          <button id="prevBtn" class="bg-fuchsia-500 hover:bg-fuchsia-600 px-6 py-3 rounded-l-xl text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+            <i class="ph ph-skip-back"></i> Prev
+          </button>
+          <button id="nextBtn" class="bg-fuchsia-500 hover:bg-fuchsia-600 px-6 py-3 rounded-r-xl text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+            Next <i class="ph ph-skip-forward"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sidebar: Chapters & Lectures -->
+    <aside class="w-full lg:w-96 bg-white rounded-xl shadow p-4 h-max sticky top-28 self-start fade-in order-2 lg:order-2">
+      <h2 class="font-bold text-xl text-fuchsia-600 mb-4 flex items-center gap-2">
+        <i class="ph ph-bird"></i> Course Content
+      </h2>
+      <div class="lectures-scroll overflow-y-auto max-h-[70vh] pr-2">
+        <div id="chaptersList" class="space-y-2">
+          <!-- Chapters and lectures rendered by JS -->
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-fuchsia-100 text-fuchsia-900 text-center py-8 flex flex-col gap-3 items-center">
+    <span class="font-extrabold text-xl text-fuchsia-600">WebMastery</span>
+    <span class="text-sm text-fuchsia-500">&copy; 2025 WebMastery. All rights reserved.</span>
+  </footer>
+
+  <script>
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.style.display = mobileMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    function fadeInOnScroll() {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= window.innerHeight - 64) {
+          el.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', fadeInOnScroll);
+    window.addEventListener('DOMContentLoaded', fadeInOnScroll);
+
+    const chaptersData = [
+      {
+        name: "Physiology",
+        lectures: [
+          {
+            title: "Breathing || Podcast || Akansha mam",
+            desc: "Breathing and exchange of gases class 11th NEET podcast by Akansha mam.",
+            src: "https://play.gumlet.io/embed/68a1e82d2517393e58840766?background=false&autoplay=false&loop=false&disableControls=false"
+          },
+          {
+            title: "Circulation || Podcast || Akansha mam",
+            desc: "Body fluids and its circulation class 11th NEET podcast by Akansha mam.",
+            src: "https://play.gumlet.io/embed/68a1ebe9396b42f2f687a18e?background=false&autoplay=false&loop=false&disableControls=false"
+          }
+        ]
+      },
+      {
+        name: "Other chapters",
+        lectures: [
+          {
+            title: "Subphylum Vertebrata",
+            desc: "Vertebrates characteristics and examples.",
+            src: "https://play.gumlet.io/embed/another-video-id"
+          },
+          {
+            title: "Class Mammalia",
+            desc: "Overview of mammal characteristics.",
+            src: "https://play.gumlet.io/embed/another-video-id"
+          }
+        ]
+      }
+    ];
+
+    const chaptersList = document.getElementById("chaptersList");
+    let current = { chap: 0, lec: 0 };
+
+    function renderChapters(activeChap, activeLec) {
+      chaptersList.innerHTML = "";
+      chaptersData.forEach((chapter, cIdx) => {
+        const chapDiv = document.createElement('div');
+        const chapHead = document.createElement('div');
+        chapHead.textContent = `${cIdx + 1}. ${chapter.name}`;
+        chapHead.className = "font-bold text-fuchsia-600 mt-4 mb-2 text-lg";
+        chapDiv.appendChild(chapHead);
+        chapter.lectures.forEach((lec, lIdx) => {
+          const lecTab = document.createElement("div");
+          lecTab.className = "lecture-tab rounded-lg px-4 py-3 text-gray-700 mb-2 " +
+            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow-md" : "hover:shadow-sm cursor-pointer");
+          lecTab.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="bg-fuchsia-100 text-fuchsia-600 px-2 py-1 rounded text-sm font-bold">${cIdx+1}.${lIdx+1}</span>
+              <div class="flex-1">
+                <div class="font-medium">${lec.title}</div>
+                <div class="text-sm text-gray-500 truncate">${lec.desc}</div>
+              </div>
+            </div>
+          `;
+          lecTab.onclick = () => setLecture(cIdx, lIdx);
+          chapDiv.appendChild(lecTab);
+        });
+        chaptersList.appendChild(chapDiv);
+      });
+    }
+
+    function setLecture(chapIdx, lecIdx) {
+      const lec = chaptersData[chapIdx].lectures[lecIdx];
+      const iframe = document.querySelector("section.flex-1 iframe");
+      iframe.src = lec.src;
+      document.getElementById("lectureTitle").textContent = lec.title;
+      document.getElementById("lectureDesc").textContent = lec.desc;
+      current.chap = chapIdx;
+      current.lec = lecIdx;
+
+      renderChapters(chapIdx, lecIdx);
+      
+      if (window.innerWidth < 1024) {
+        window.scrollTo({top: iframe.getBoundingClientRect().top + window.pageYOffset - 120, behavior: 'smooth'});
+      }
+    }
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    if(prevBtn && nextBtn) {
+      prevBtn.addEventListener("click", () => {
+        let { chap, lec } = current;
+        if(lec > 0) lec--;
+        else if(chap > 0) {
+          chap--;
+          lec = chaptersData[chap].lectures.length - 1;
+        } else return;
+        setLecture(chap, lec);
+      });
+
+      nextBtn.addEventListener("click", () => {
+        let { chap, lec } = current;
+        if(lec < chaptersData[chap].lectures.length - 1) lec++;
+        else if(chap < chaptersData.length - 1) {
+          chap++;
+          lec = 0;
+        } else return;
+        setLecture(chap, lec);
+      });
+    }
+
+    renderChapters(0, 0);
+    setLecture(0, 0);
+  </script>
+</body>
+</html>
