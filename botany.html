@@ -1,1 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Botany Course Content | WebMastery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    #mobileMenu { display: none; }
+    .active-lecture { background: linear-gradient(to right, #bbf7d0 60%, #fff 100%); font-weight: bold; }
+    .lecture-tab { cursor: pointer; transition: background 0.2s; }
+    .lecture-tab:hover { background: #f0fdf4; }
+    /* Hide scrollbars on the lecture list on webkit browsers */
+    .lectures-scroll::-webkit-scrollbar { display: none; }
+    .lectures-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-green-50 font-inter min-h-screen">
 
+  <!-- Header (can be simplified for learning platform) -->
+  <header class="bg-white fixed w-full top-0 z-40 shadow-sm">
+    <nav class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+      <a class="text-2xl font-black tracking-tight text-green-700" href="/">WebMastery</a>
+      <ul id="desktopMenu" class="hidden md:flex items-center space-x-7 text-gray-700 font-semibold">
+        <li><a href="/" class="hover:text-green-700">Home</a></li>
+        <li><a href="/botany.html" class="hover:text-green-700">Course Details</a></li>
+        <li><a href="/botany-content.html" class="hover:text-green-700 font-extrabold text-green-700">Course Content</a></li>
+        <li><a href="#profile" class="hover:text-green-700"><i class="ph ph-user-circle"></i></a></li>
+      </ul>
+      <div id="menuBtn" class="md:hidden text-3xl text-green-700 cursor-pointer">&#9776;</div>
+    </nav>
+    <ul id="mobileMenu" class="md:hidden bg-white text-gray-700 flex flex-col space-y-5 p-8 text-lg shadow">
+      <li><a href="/" class="hover:text-green-700">Home</a></li>
+      <li><a href="/botany.html" class="hover:text-green-700">Course Details</a></li>
+      <li><a href="/botany-content.html" class="hover:text-green-700 font-extrabold text-green-700">Course Content</a></li>
+      <li><a href="#profile" class="hover:text-green-700"><i class="ph ph-user-circle"></i> Profile</a></li>
+    </ul>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-2 md:px-8 flex flex-col md:flex-row gap-8 pt-32 pb-12">
+
+    <!-- Sidebar: Chapters & Lectures -->
+    <aside class="w-full md:w-80 bg-white rounded-xl shadow p-4 h-max sticky top-28 self-start fade-in">
+      <h2 class="font-bold text-lg text-green-700 mb-4 flex items-center gap-2">
+        <i class="ph ph-plant"></i> Botany Chapters
+      </h2>
+      <div class="lectures-scroll overflow-y-auto max-h-[70vh] pr-2">
+        <!-- Example Chapter Structure -->
+        <div id="chaptersList" class="space-y-2">
+
+          <!-- Chapter and lectures rendered by JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Lecture Player Section -->
+    <section class="flex-1 bg-white rounded-xl shadow-lg fade-in">
+      <div class="relative p-4 pb-0">
+        <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden shadow">
+          <iframe id="lecturePlayer"
+            class="w-full h-full rounded-lg"
+            src="https://www.youtube.com/embed/bb5WvFJVBp0"
+            title="Botany Sample Lecture"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-5 pb-3">
+          <div>
+            <h1 id="lectureTitle" class="text-2xl font-bold text-green-800 mb-1">Plant Morphology Basics</h1>
+            <div id="lectureDesc" class="text-gray-600">An introduction to the structure of plants and their classification.</div>
+          </div>
+          <!-- Controls: Previous/Next (optional) -->
+          <div class="flex gap-2 mt-3 md:mt-0">
+            <button id="prevBtn" class="bg-green-200 px-4 py-2 rounded-l-md text-green-700 font-bold hover:bg-green-300 disabled:opacity-40">Prev</button>
+            <button id="nextBtn" class="bg-green-200 px-4 py-2 rounded-r-md text-green-700 font-bold hover:bg-green-300 disabled:opacity-40">Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-green-100 text-green-900 text-center py-8 flex flex-col gap-3 items-center">
+    <span class="font-extrabold text-xl text-green-700">WebMastery</span>
+    <span class="text-sm text-green-500">&copy; 2025 WebMastery. All rights reserved.</span>
+  </footer>
+
+  <!-- Fade In Animations + JS Logic -->
+  <script>
+    // 1) Responsive mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.style.display = mobileMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    // 2) Fade-in effect
+    function fadeInOnScroll() {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= window.innerHeight - 64) {
+          el.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', fadeInOnScroll);
+    window.addEventListener('DOMContentLoaded', fadeInOnScroll);
+
+    // 3) Chapters/Lectures Data
+    const chaptersData = [
+      {
+        name: "Plant Morphology",
+        lectures: [
+          {
+            title: "Plant Morphology Basics",
+            desc: "An introduction to the structure of plants and their classification.",
+            youtube: "bb5WvFJVBp0"
+          },
+          {
+            title: "Roots, Stems, Leaves",
+            desc: "Understanding the different organs and their modifications.",
+            youtube: "uKDGjS6QCwQ"
+          }
+        ]
+      },
+      {
+        name: "Plant Anatomy",
+        lectures: [
+          {
+            title: "Cell Types & Tissues",
+            desc: "Plant cells, simple and complex tissues with examples.",
+            youtube: "wUJxrqBXY6w"
+          },
+          {
+            title: "Vascular Tissue",
+            desc: "Phloem & xylem: structure, function, and importance.",
+            youtube: "Lx8DXMRkStA"
+          }
+        ]
+      },
+      {
+        name: "Plant Physiology",
+        lectures: [
+          {
+            title: "Photosynthesis",
+            desc: "Exploring the process of photosynthesis in plants.",
+            youtube: "D1aN3Ev5Bz8"
+          },
+          {
+            title: "Transpiration & Water Movement",
+            desc: "Mechanism and significance of transpiration.",
+            youtube: "OPkqrhHxGFU"
+          }
+        ]
+      }
+    ];
+
+    // 4) Render chapters and lectures
+    const chaptersList = document.getElementById("chaptersList");
+    let current = { chap: 0, lec: 0 };
+
+    function renderChapters(activeChap, activeLec) {
+      chaptersList.innerHTML = "";
+      chaptersData.forEach((chapter, cIdx) => {
+        const chapDiv = document.createElement('div');
+        // Chapter title
+        const chapHead = document.createElement('div');
+        chapHead.textContent = `${cIdx + 1}. ${chapter.name}`;
+        chapHead.className = "font-bold text-green-700 mt-4 mb-2 text-md";
+        chapDiv.appendChild(chapHead);
+        // Lectures in chapter
+        chapter.lectures.forEach((lec, lIdx) => {
+          const lecTab = document.createElement("div");
+          lecTab.className = "lecture-tab rounded-lg px-3 py-2 text-gray-700 mb-1 " +
+            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow" : "");
+          lecTab.innerHTML = `<span class="pr-2 text-green-700">${cIdx+1}.${lIdx+1}</span> ${lec.title}`;
+          lecTab.onclick = () => setLecture(cIdx, lIdx);
+          chapDiv.appendChild(lecTab);
+        });
+        chaptersList.appendChild(chapDiv);
+      });
+    }
+
+    // 5) Set lecture in player
+    function setLecture(chapIdx, lecIdx) {
+      const lec = chaptersData[chapIdx].lectures[lecIdx];
+      document.getElementById("lecturePlayer").src = "https://www.youtube.com/embed/" + lec.youtube + "?autoplay=1";
+      document.getElementById("lectureTitle").textContent = lec.title;
+      document.getElementById("lectureDesc").textContent = lec.desc;
+      current.chap = chapIdx;
+      current.lec = lecIdx;
+      renderChapters(chapIdx, lecIdx);
+      // Scroll to player on mobile
+      if (window.innerWidth < 768) window.scrollTo({top:document.getElementById('lecturePlayer').offsetTop-120, behavior:'smooth'});
+    }
+
+    // 6) Prev/Next navigation
+    function prevLecture() {
+      let { chap, lec } = current;
+      if (lec > 0) lec--;
+      else if (chap > 0) { chap--; lec = chaptersData[chap].lectures.length-1; }
+      else return;
+      setLecture(chap, lec);
+    }
+    function nextLecture() {
+      let { chap, lec } = current;
+      if (lec < chaptersData[chap].lectures.length-1) lec++;
+      else if (chap < chaptersData.length-1) { chap++; lec = 0; }
+      else return;
+      setLecture(chap, lec);
+    }
+    document.getElementById("prevBtn").onclick = prevLecture;
+    document.getElementById("nextBtn").onclick = nextLecture;
+
+    // Init
+    renderChapters(0, 0);
+    setLecture(0, 0);
+  </script>
+</body>
+</html>
