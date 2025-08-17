@@ -1,100 +1,204 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LearnStack — Courses</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebMastery - Explore Courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Heroicons for icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    #mobileMenu { display: none; }
+    nav a.active { color: #3b82f6; font-weight: 600; }
+    .fade-in { opacity: 0; transform: translateY(32px); transition: opacity 0.8s, transform 0.8s; }
+    .fade-in.visible { opacity: 1; transform: none; }
+  </style>
 </head>
-<body>
-  <header class="topnav" role="banner">
-    <div class="container nav-inner">
-      <div class="brand" id="site-title">
-        <a href="#" data-route="home" class="logo-link">LearnStack</a>
-      </div>
+<body class="font-inter bg-gray-50 min-h-screen">
 
-      <button id="hamburger" class="hamburger" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="hamburger-bar" aria-hidden="true"></span>
-        <span class="hamburger-bar" aria-hidden="true"></span>
-        <span class="hamburger-bar" aria-hidden="true"></span>
-      </button>
-
-      <nav id="main-nav" class="main-nav" role="navigation" aria-label="Main Navigation">
-        <ul class="nav-list">
-          <li><a href="#" data-route="home">Home</a></li>
-          <li><a href="#" data-route="categories">Categories</a></li>
-          <li><a href="#" data-route="progress">My Progress <span id="progress-pill" class="progress-pill" aria-hidden="true"></span></a></li>
-        </ul>
-      </nav>
-    </div>
+  <!-- Header -->
+  <header class="bg-white fixed w-full top-0 z-50 shadow-sm">
+    <nav class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+      <a class="text-2xl font-black tracking-tight text-blue-600" href="/">WebMastery</a>
+      <ul id="desktopMenu" class="hidden md:flex space-x-7 items-center text-gray-700 font-semibold">
+        <li><a href="#courses" class="hover:text-blue-500">Courses</a></li>
+        <li><a href="#features" class="hover:text-blue-500">Why Us</a></li>
+        <li><a href="#testimonials" class="hover:text-blue-500">Success</a></li>
+        <li><a href="#contact" class="hover:text-blue-500">Contact</a></li>
+        <li><a href="#courses" class="bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-2 rounded-full shadow font-bold text-white ml-2 hover:from-blue-600 hover:to-cyan-500 transition">Explore Courses</a></li>
+      </ul>
+      <!-- Hamburger Icon -->
+      <div id="menuBtn" class="md:hidden text-3xl text-blue-600 cursor-pointer">&#9776;</div>
+    </nav>
+    <!-- Mobile Menu -->
+    <ul id="mobileMenu" class="md:hidden bg-white text-gray-700 flex flex-col space-y-5 p-8 text-lg shadow">
+      <li><a href="#courses" class="hover:text-blue-600">Courses</a></li>
+      <li><a href="#features" class="hover:text-blue-600">Why Us</a></li>
+      <li><a href="#testimonials" class="hover:text-blue-600">Success</a></li>
+      <li><a href="#contact" class="hover:text-blue-600">Contact</a></li>
+      <li><a href="#courses" class="bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-2 rounded-full shadow text-white">Explore Courses</a></li>
+    </ul>
   </header>
 
-  <main id="app" role="main" class="container" data-sheet-url="">
-    <section id="home-page" class="page" aria-labelledby="home-title">
-      <h1 id="home-title" class="sr-only">Courses Home</h1>
-      <div class="controls" role="search" aria-label="Course search and filter">
-        <div class="search-wrap">
-          <label for="search" class="visually-hidden">Search courses</label>
-          <input id="search" type="search" placeholder="Search courses, e.g. 'biology'" autocomplete="off" />
-        </div>
-        <div class="filter-wrap">
-          <label for="category-filter" class="visually-hidden">Filter by category</label>
-          <select id="category-filter" aria-label="Filter by category"></select>
-        </div>
-      </div>
-      <section id="courses-grid" aria-labelledby="courses-heading">
-        <h2 id="courses-heading" class="sr-only">Available Courses</h2>
-        <div id="grid" class="grid" role="list"></div>
-      </section>
-    </section>
+  <!-- Hero Section -->
+  <section class="relative pt-40 pb-24 bg-gradient-to-br from-blue-100 via-white to-cyan-100 text-center" id="intro">
+    <div class="max-w-4xl mx-auto flex flex-col items-center px-4">
+      <span class="uppercase text-xs tracking-widest mb-4 font-bold text-blue-600">Unlock Your Potential</span>
+      <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight text-blue-700 drop-shadow">Engage. Learn. Excel.</h1>
+      <p class="text-lg md:text-2xl mb-8 text-gray-700 font-medium">Start your academic journey with India's top experts. Choose Botany, Zoology, Physics, Chemistry—and achieve mastery, not just marks.</p>
+      <a href="#courses" class="inline-block bg-blue-600 hover:bg-blue-700 transition px-8 py-3 text-lg rounded-full text-white font-bold drop-shadow-lg shadow-lg">Browse Our Courses</a>
+    </div>
+    <!-- Shapes for extra polish -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none select-none" aria-hidden="true">
+      <svg width="100%" height="100%">
+        <circle cx="80" cy="180" r="48" fill="#3b82f6" />
+        <circle cx="94%" cy="80" r="40" fill="#e0f2fe" />
+        <circle cx="95%" cy="400" r="32" fill="#22d3ee" />
+      </svg>
+    </div>
+  </section>
 
-    <section id="course-page" class="page" hidden aria-labelledby="course-title">
-      <button id="back-to-home" class="link-back" aria-label="Back to courses">← Back to courses</button>
-      <header class="course-header">
-        <h2 id="course-title"></h2>
-        <div class="meta-row" id="course-meta"></div>
-      </header>
-      <div class="video-wrapper" id="video-wrapper"></div>
-      <article id="course-desc" class="course-desc" aria-labelledby="desc-heading">
-        <h3 id="desc-heading">Course Description</h3>
-        <p id="course-full-desc"></p>
-        <section id="resources" aria-labelledby="resources-heading">
-          <h4 id="resources-heading">Resources</h4>
-          <ul id="resources-list" class="resources-list"></ul>
-        </section>
-        <div class="cta-row">
-          <button id="mark-complete" class="btn primary" aria-pressed="false">Mark as Completed</button>
-          <span id="complete-badge" class="badge hidden" aria-live="polite">Completed ✓</span>
-        </div>
-      </article>
-    </section>
+  <!-- Courses Grid Section -->
+  <section id="courses" class="max-w-7xl mx-auto px-6 py-20">
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">Find Your Course</h2>
+    <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <!-- BOTANY -->
+      <a href="/botany.html" class="fade-in group bg-white border border-blue-100 rounded-xl p-8 flex flex-col items-center text-center shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <i class="ph ph-plant text-6xl mb-3 text-green-500 group-hover:scale-110 transition"></i>
+        <h3 class="text-2xl font-bold mb-2 group-hover:text-green-600 transition">Botany</h3>
+        <p class="text-gray-600 mb-4">Explore the diversity, evolution, and importance of the plant kingdom.</p>
+        <span class="text-green-500 font-semibold group-hover:underline">Start Botany</span>
+      </a>
+      <!-- ZOOLOGY -->
+      <a href="/zoology.html" class="fade-in group bg-white border border-blue-100 rounded-xl p-8 flex flex-col items-center text-center shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <i class="ph ph-bird text-6xl mb-3 text-fuchsia-500 group-hover:scale-110 transition"></i>
+        <h3 class="text-2xl font-bold mb-2 group-hover:text-fuchsia-600 transition">Zoology</h3>
+        <p class="text-gray-600 mb-4">Understand animal science, ecosystems, and evolutionary biology.</p>
+        <span class="text-fuchsia-500 font-semibold group-hover:underline">Start Zoology</span>
+      </a>
+      <!-- PHYSICS -->
+      <a href="/physics.html" class="fade-in group bg-white border border-blue-100 rounded-xl p-8 flex flex-col items-center text-center shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <i class="ph ph-atom text-6xl mb-3 text-blue-500 group-hover:scale-110 transition"></i>
+        <h3 class="text-2xl font-bold mb-2 group-hover:text-blue-600 transition">Physics</h3>
+        <p class="text-gray-600 mb-4">Master principles of energy, motion, and the laws that shape everything.</p>
+        <span class="text-blue-500 font-semibold group-hover:underline">Start Physics</span>
+      </a>
+      <!-- CHEMISTRY -->
+      <a href="/chemistry.html" class="fade-in group bg-white border border-blue-100 rounded-xl p-8 flex flex-col items-center text-center shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <i class="ph ph-flask text-6xl mb-3 text-orange-400 group-hover:scale-110 transition"></i>
+        <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-500 transition">Chemistry</h3>
+        <p class="text-gray-600 mb-4">Go deep into reactions, elements, and the science of matter.</p>
+        <span class="text-orange-500 font-semibold group-hover:underline">Start Chemistry</span>
+      </a>
+    </div>
+  </section>
 
-    <section id="progress-page" class="page" hidden aria-labelledby="progress-title">
-      <h2 id="progress-title">My Progress</h2>
-      <div class="progress-summary">
-        <div class="progress-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-gradient-to-br from-blue-50 to-cyan-50 border-t border-gray-200">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Why Study With Us?</h2>
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="fade-in bg-white rounded-lg shadow-md p-8 text-center">
+          <i class="ph ph-graduation-cap text-4xl text-blue-600 mb-3"></i>
+          <h3 class="text-xl font-bold mb-2">Expert Faculty</h3>
+          <p class="text-gray-600">Learn from India’s top educators with research and teaching excellence.</p>
         </div>
-        <p id="progress-text">0% complete</p>
-      </div>
-      <section id="completed-list" aria-labelledby="completed-heading">
-        <h3 id="completed-heading">Completed Courses</h3>
-        <ul id="completed-courses" class="completed-courses"></ul>
-      </section>
-    </section>
-  </main>
-
-  <footer class="site-footer" role="contentinfo">
-    <div class="container footer-inner">
-      <small>© <span id="year"></span> LearnStack. All rights reserved.</small>
-      <div class="social">
-        <a href="#" aria-label="Twitter (placeholder)" class="social-link">🐦</a>
-        <a href="#" aria-label="LinkedIn (placeholder)" class="social-link">🔗</a>
-        <a href="#" aria-label="GitHub (placeholder)" class="social-link">🐱</a>
+        <div class="fade-in bg-white rounded-lg shadow-md p-8 text-center">
+          <i class="ph ph-books text-4xl text-fuchsia-500 mb-3"></i>
+          <h3 class="text-xl font-bold mb-2">Cutting-edge Curriculum</h3>
+          <p class="text-gray-600">Up-to-date courses, real projects, quizzes, and personalized feedback.</p>
+        </div>
+        <div class="fade-in bg-white rounded-lg shadow-md p-8 text-center">
+          <i class="ph ph-trophy text-4xl text-orange-400 mb-3"></i>
+          <h3 class="text-xl font-bold mb-2">Proven Track Record</h3>
+          <p class="text-gray-600">Thousands of students admit to IIMs, IITs, and top universities worldwide.</p>
+        </div>
       </div>
     </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="py-20 bg-white border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Success Stories</h2>
+      <!-- Testimonials Slider (static for demo)-->
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="fade-in bg-gradient-to-br from-blue-100 to-white rounded-lg shadow-md p-7">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="" class="w-12 h-12 rounded-full border-2 border-blue-400">
+            <div>
+              <div class="font-bold">Amit Sharma</div>
+              <div class="text-xs text-gray-500">JEE AIR 86</div>
+            </div>
+          </div>
+          <p class="italic text-gray-700">"The detailed lectures & instant support helped me secure my dream college! Highly recommend for anyone who wants to actually understand concepts deeply."</p>
+        </div>
+        <div class="fade-in bg-gradient-to-br from-orange-100 to-white rounded-lg shadow-md p-7">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="" class="w-12 h-12 rounded-full border-2 border-orange-400">
+            <div>
+              <div class="font-bold">Priya Patel</div>
+              <div class="text-xs text-gray-500">Medical Topper</div>
+            </div>
+          </div>
+          <p class="italic text-gray-700">"The botany and zoology courses made my basics rock-solid. The blended notes and doubt clearing are the best I've seen."</p>
+        </div>
+        <div class="fade-in bg-gradient-to-br from-fuchsia-100 to-white rounded-lg shadow-md p-7">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="https://randomuser.me/api/portraits/men/51.jpg" alt="" class="w-12 h-12 rounded-full border-2 border-fuchsia-400">
+            <div>
+              <div class="font-bold">Rahul Singh</div>
+              <div class="text-xs text-gray-500">Physics Olympiad</div>
+            </div>
+          </div>
+          <p class="italic text-gray-700">"The practice sheets, mock tests, and in-depth concept classes helped me crack the olympiad in my first attempt!"</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact/Call to Action -->
+  <section id="contact" class="py-20 border-t border-gray-100 bg-blue-50 text-center">
+    <div class="max-w-xl mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-3 text-gray-900">Have Questions?</h2>
+      <p class="text-gray-700 mb-8">We’re here to help you choose the right course and achieve your goals.</p>
+      <a href="mailto:info@webdevmastery.com" class="inline-block bg-blue-700 hover:bg-blue-800 transition px-8 py-3 rounded-full text-white font-bold shadow text-lg">Email Us</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 text-gray-700 text-center py-8 flex flex-col gap-3 items-center">
+    <span class="font-extrabold text-xl text-blue-600">WebMastery</span>
+    <div class="flex gap-4 text-2xl justify-center">
+      <a href="#" class="hover:text-blue-600"><i class="ph ph-instagram-logo"></i></a>
+      <a href="#" class="hover:text-blue-600"><i class="ph ph-facebook-logo"></i></a>
+      <a href="#" class="hover:text-blue-600"><i class="ph ph-twitter-logo"></i></a>
+      <a href="#" class="hover:text-blue-600"><i class="ph ph-linkedin-logo"></i></a>
+    </div>
+    <span class="text-sm text-gray-500">&copy; 2025 WebMastery. All rights reserved.</span>
   </footer>
 
-  <script src="script.js" defer></script>
+  <!-- Reveal Fade-in Animation on Scroll -->
+  <script>
+    // Mobile Menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.style.display = mobileMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    // Simple fade-in effect on scroll
+    function fadeInOnScroll() {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= window.innerHeight - 64) {
+          el.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', fadeInOnScroll);
+    window.addEventListener('DOMContentLoaded', fadeInOnScroll);
+  </script>
 </body>
 </html>
