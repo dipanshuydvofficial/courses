@@ -14,11 +14,32 @@
     /* Hide scrollbars on the lecture list on webkit browsers */
     .lectures-scroll::-webkit-scrollbar { display: none; }
     .lectures-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Custom aspect ratio for larger video */
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    /* Make video even larger on desktop */
+    @media (min-width: 1024px) {
+      .video-container {
+        padding-bottom: 60%; /* Slightly taller on desktop */
+        min-height: 500px;
+      }
+    }
   </style>
 </head>
 <body class="bg-green-50 font-inter min-h-screen">
 
-  <!-- Header (can be simplified for learning platform) -->
+  <!-- Header -->
   <header class="bg-white fixed w-full top-0 z-40 shadow-sm">
     <nav class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
       <a class="text-2xl font-black tracking-tight text-green-700" href="/">WebMastery</a>
@@ -39,46 +60,52 @@
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-2 md:px-8 flex flex-col md:flex-row gap-8 pt-32 pb-12">
+  <main class="max-w-full mx-auto px-2 md:px-4 flex flex-col lg:flex-row gap-6 pt-28 pb-12">
 
-    <!-- Sidebar: Chapters & Lectures -->
-    <aside class="w-full md:w-80 bg-white rounded-xl shadow p-4 h-max sticky top-28 self-start fade-in">
-      <h2 class="font-bold text-lg text-green-700 mb-4 flex items-center gap-2">
-        <i class="ph ph-plant"></i> Botany Chapters
+    <!-- Lecture Player Section (Now takes priority and more space) -->
+    <section class="flex-1 bg-white rounded-xl shadow-lg fade-in order-1 lg:order-1">
+      <div class="p-4 md:p-6">
+        <!-- Much Larger Video Container -->
+        <div class="video-container bg-black rounded-xl overflow-hidden shadow-2xl mb-6">
+          <iframe id="lecturePlayer"
+            src="https://www.youtube.com/embed/QwsB8-OixhI"
+            title="Botany Sample Lecture"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen
+            class="rounded-xl"></iframe>
+        </div>
+        
+        <!-- Lecture Info -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div class="flex-1">
+            <h1 id="lectureTitle" class="text-2xl md:text-3xl font-bold text-green-800 mb-2">Vipin Sharma One shot</h1>
+            <div id="lectureDesc" class="text-gray-600 text-lg">Plant Growth Regulators || one shot by Vipin sir || Prachand</div>
+          </div>
+          <!-- Controls: Previous/Next -->
+          <div class="flex gap-2 mt-3 md:mt-0">
+            <button id="prevBtn" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-l-xl text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+              <i class="ph ph-skip-back"></i> Prev
+            </button>
+            <button id="nextBtn" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-r-xl text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+              Next <i class="ph ph-skip-forward"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sidebar: Chapters & Lectures (Now smaller and on the right) -->
+    <aside class="w-full lg:w-96 bg-white rounded-xl shadow p-4 h-max sticky top-28 self-start fade-in order-2 lg:order-2">
+      <h2 class="font-bold text-xl text-green-700 mb-4 flex items-center gap-2">
+        <i class="ph ph-plant"></i> Course Content
       </h2>
       <div class="lectures-scroll overflow-y-auto max-h-[70vh] pr-2">
-        <!-- Example Chapter Structure -->
         <div id="chaptersList" class="space-y-2">
-
           <!-- Chapter and lectures rendered by JS -->
         </div>
       </div>
     </aside>
 
-    <!-- Lecture Player Section -->
-    <section class="flex-1 bg-white rounded-xl shadow-lg fade-in">
-      <div class="relative p-4 pb-0">
-        <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden shadow">
-          <iframe id="lecturePlayer"
-            class="w-full h-full rounded-lg"
-            src="https://www.youtube.com/embed/bb5WvFJVBp0"
-            title="Botany Sample Lecture"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
-        </div>
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-5 pb-3">
-          <div>
-            <h1 id="lectureTitle" class="text-2xl font-bold text-green-800 mb-1">Vipin Sharma One shot</h1>
-            <div id="lectureDesc" class="text-gray-600">Plant Growth Regulators || one shot by Vipin sir || Prachand</div>
-          </div>
-          <!-- Controls: Previous/Next (optional) -->
-          <div class="flex gap-2 mt-3 md:mt-0">
-            <button id="prevBtn" class="bg-green-200 px-4 py-2 rounded-l-md text-green-700 font-bold hover:bg-green-300 disabled:opacity-40">Prev</button>
-            <button id="nextBtn" class="bg-green-200 px-4 py-2 rounded-r-md text-green-700 font-bold hover:bg-green-300 disabled:opacity-40">Next</button>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- Footer -->
@@ -87,7 +114,7 @@
     <span class="text-sm text-green-500">&copy; 2025 WebMastery. All rights reserved.</span>
   </footer>
 
-  <!-- Fade In Animations + JS Logic -->
+  <!-- JS Logic -->
   <script>
     // 1) Responsive mobile menu
     const menuBtn = document.getElementById("menuBtn");
@@ -116,7 +143,7 @@
           {
             title: "Vipin Sharma One shot",
             desc: "Plant Growth Regulators || one shot by Vipin sir || Prachand.",
-            youtube: "QwsB8-OixhI?si=mN7GgQRmGt9DTkUs"
+            youtube: "QwsB8-OixhI"
           },
           {
             title: "Roots, Stems, Leaves",
@@ -168,14 +195,22 @@
         // Chapter title
         const chapHead = document.createElement('div');
         chapHead.textContent = `${cIdx + 1}. ${chapter.name}`;
-        chapHead.className = "font-bold text-green-700 mt-4 mb-2 text-md";
+        chapHead.className = "font-bold text-green-700 mt-4 mb-2 text-lg";
         chapDiv.appendChild(chapHead);
         // Lectures in chapter
         chapter.lectures.forEach((lec, lIdx) => {
           const lecTab = document.createElement("div");
-          lecTab.className = "lecture-tab rounded-lg px-3 py-2 text-gray-700 mb-1 " +
-            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow" : "");
-          lecTab.innerHTML = `<span class="pr-2 text-green-700">${cIdx+1}.${lIdx+1}</span> ${lec.title}`;
+          lecTab.className = "lecture-tab rounded-lg px-4 py-3 text-gray-700 mb-2 " +
+            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow-md" : "hover:shadow-sm");
+          lecTab.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-bold">${cIdx+1}.${lIdx+1}</span>
+              <div class="flex-1">
+                <div class="font-medium">${lec.title}</div>
+                <div class="text-sm text-gray-500 truncate">${lec.desc}</div>
+              </div>
+            </div>
+          `;
           lecTab.onclick = () => setLecture(cIdx, lIdx);
           chapDiv.appendChild(lecTab);
         });
@@ -186,31 +221,65 @@
     // 5) Set lecture in player
     function setLecture(chapIdx, lecIdx) {
       const lec = chaptersData[chapIdx].lectures[lecIdx];
-      document.getElementById("lecturePlayer").src = "https://www.youtube.com/embed/" + lec.youtube + "?autoplay=1";
+      // Clean YouTube URL - remove any extra parameters
+      const youtubeId = lec.youtube.split('?')[0];
+      document.getElementById("lecturePlayer").src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
       document.getElementById("lectureTitle").textContent = lec.title;
       document.getElementById("lectureDesc").textContent = lec.desc;
       current.chap = chapIdx;
       current.lec = lecIdx;
       renderChapters(chapIdx, lecIdx);
+      
+      // Update button states
+      updateButtonStates();
+      
       // Scroll to player on mobile
-      if (window.innerWidth < 768) window.scrollTo({top:document.getElementById('lecturePlayer').offsetTop-120, behavior:'smooth'});
+      if (window.innerWidth < 1024) {
+        window.scrollTo({top: document.getElementById('lecturePlayer').offsetTop - 120, behavior: 'smooth'});
+      }
     }
 
-    // 6) Prev/Next navigation
+    // 6) Update button states
+    function updateButtonStates() {
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      
+      // Disable prev if at first lecture of first chapter
+      prevBtn.disabled = (current.chap === 0 && current.lec === 0);
+      
+      // Disable next if at last lecture of last chapter
+      const isLastChapter = current.chap === chaptersData.length - 1;
+      const isLastLecture = current.lec === chaptersData[current.chap].lectures.length - 1;
+      nextBtn.disabled = (isLastChapter && isLastLecture);
+    }
+
+    // 7) Prev/Next navigation
     function prevLecture() {
       let { chap, lec } = current;
-      if (lec > 0) lec--;
-      else if (chap > 0) { chap--; lec = chaptersData[chap].lectures.length-1; }
-      else return;
+      if (lec > 0) {
+        lec--;
+      } else if (chap > 0) {
+        chap--;
+        lec = chaptersData[chap].lectures.length - 1;
+      } else {
+        return;
+      }
       setLecture(chap, lec);
     }
+
     function nextLecture() {
       let { chap, lec } = current;
-      if (lec < chaptersData[chap].lectures.length-1) lec++;
-      else if (chap < chaptersData.length-1) { chap++; lec = 0; }
-      else return;
+      if (lec < chaptersData[chap].lectures.length - 1) {
+        lec++;
+      } else if (chap < chaptersData.length - 1) {
+        chap++;
+        lec = 0;
+      } else {
+        return;
+      }
       setLecture(chap, lec);
     }
+
     document.getElementById("prevBtn").onclick = prevLecture;
     document.getElementById("nextBtn").onclick = nextLecture;
 
