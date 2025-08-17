@@ -149,7 +149,7 @@
             title: "Vipin Sharma Revision",
             desc: "Plant Growth Regulators || Revision by Vipin sir || Umeed",
             youtube: "VP7wW9Sg5Jo"
-          }
+          },
           {
             title: "Akansha mam Podcast",
             desc: "Plant Growth Regulators || Podcast by Akansha mam || Umeed",
@@ -158,8 +158,34 @@
         ]
       },
       {
-        
-      
+        name: "Plant Anatomy",
+        lectures: [
+          {
+            title: "Cell Types & Tissues",
+            desc: "Plant cells, simple and complex tissues with examples.",
+            youtube: "wUJxrqBXY6w"
+          },
+          {
+            title: "Vascular Tissue",
+            desc: "Phloem & xylem: structure, function, and importance.",
+            youtube: "Lx8DXMRkStA"
+          }
+        ]
+      },
+      {
+        name: "Plant Physiology",
+        lectures: [
+          {
+            title: "Photosynthesis",
+            desc: "Exploring the process of photosynthesis in plants.",
+            youtube: "D1aN3Ev5Bz8"
+          },
+          {
+            title: "Transpiration & Water Movement",
+            desc: "Mechanism and significance of transpiration.",
+            youtube: "OPkqrhHxGFU"
+          }
+        ]
       }
     ];
 
@@ -180,7 +206,7 @@
         chapter.lectures.forEach((lec, lIdx) => {
           const lecTab = document.createElement("div");
           lecTab.className = "lecture-tab rounded-lg px-4 py-3 text-gray-700 mb-2 " +
-            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow-md" : "hover:shadow-sm");
+            (cIdx === activeChap && lIdx === activeLec ? "active-lecture shadow-md" : "hover:shadow-sm cursor-pointer");
           lecTab.innerHTML = `
             <div class="flex items-center gap-3">
               <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-bold">${cIdx+1}.${lIdx+1}</span>
@@ -200,7 +226,6 @@
     // 5) Set lecture in player
     function setLecture(chapIdx, lecIdx) {
       const lec = chaptersData[chapIdx].lectures[lecIdx];
-      // Clean YouTube URL - remove any extra parameters
       const youtubeId = lec.youtube.split('?')[0];
       document.getElementById("lecturePlayer").src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
       document.getElementById("lectureTitle").textContent = lec.title;
@@ -209,31 +234,13 @@
       current.lec = lecIdx;
       renderChapters(chapIdx, lecIdx);
       
-      // Update button states
-      updateButtonStates();
-      
       // Scroll to player on mobile
       if (window.innerWidth < 1024) {
         window.scrollTo({top: document.getElementById('lecturePlayer').offsetTop - 120, behavior: 'smooth'});
       }
     }
 
-    // 6) Update button states
-    function updateButtonStates() {
-      const prevBtn = document.getElementById("prevBtn");
-      const nextBtn = document.getElementById("nextBtn");
-      
-      // Disable prev if at first lecture of first chapter
-      prevBtn.disabled = (current.chap === 0 && current.lec === 0);
-      
-      // Disable next if at last lecture of last chapter
-      const isLastChapter = current.chap === chaptersData.length - 1;
-      const isLastLecture = current.lec === chaptersData[current.chap].lectures.length - 1;
-      nextBtn.disabled = (isLastChapter && isLastLecture);
-    }
-
-    // 7) Prev/Next navigation
-    function prevLecture() {
+    document.getElementById("prevBtn").onclick = () => {
       let { chap, lec } = current;
       if (lec > 0) {
         lec--;
@@ -244,9 +251,9 @@
         return;
       }
       setLecture(chap, lec);
-    }
+    };
 
-    function nextLecture() {
+    document.getElementById("nextBtn").onclick = () => {
       let { chap, lec } = current;
       if (lec < chaptersData[chap].lectures.length - 1) {
         lec++;
@@ -257,10 +264,7 @@
         return;
       }
       setLecture(chap, lec);
-    }
-
-    document.getElementById("prevBtn").onclick = prevLecture;
-    document.getElementById("nextBtn").onclick = nextLecture;
+    };
 
     // Init
     renderChapters(0, 0);
